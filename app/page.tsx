@@ -385,25 +385,7 @@ export default function CyberGsSiteStarter() {
         </div>
       </section>
 
-      {/* FOOTER */}
-<footer className="border-t border-white/10">
-  <div className="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-400 flex flex-wrap items-center justify-between gap-4">
-    <p>© {new Date().getFullYear()} CYBER-GS. Toate drepturile rezervate.</p>
-
-    <nav className="flex items-center gap-4">
-      <Link href="/privacy" className="hover:text-slate-200">
-        Politica de confidențialitate
-      </Link>
-      <Link href="/terms" className="hover:text-slate-200">
-        Termeni & Condiții
-      </Link>
-      <Link href="/sitemap.xml" className="hover:text-slate-200">
-        Sitemap
-      </Link>
-    </nav>
-  </div>
-</footer>
-
+     
 
       {/* Cookie banner */}
       {!cookie && (
@@ -413,9 +395,13 @@ export default function CyberGsSiteStarter() {
             <button onClick={acceptCookie} className="rounded-xl px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20">
               Accept
             </button>
-            <a href="#" className="rounded-xl px-3 py-1.5 text-sm bg-white/0 hover:bg-white/10 ring-1 ring-white/10">
-              Afla mai mult
-            </a>
+            <Link
+  href="/privacy#cookies"
+  className="rounded-xl px-3 py-1.5 text-sm bg-white/0 hover:bg-white/10 ring-1 ring-white/10"
+>
+  Află mai mult
+</Link>
+
           </div>
         </div>
       )}
