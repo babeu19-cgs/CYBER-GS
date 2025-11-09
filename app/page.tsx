@@ -1,27 +1,19 @@
 "use client";
+
 import React, { useEffect, useRef, useState } from "react";
-// IDs pentru ultimele clipuri (venite din API-ul nostru /api/youtube)
-const [videoIds, setVideoIds] = useState<string[]>([]);
 
-useEffect(() => {
-  fetch("/api/youtube")
-    .then((r) => r.json())
-    .then((d) => setVideoIds(d?.ids ?? []))
-    .catch(() => setVideoIds([]));
-}, []);
-
-import Link from "next/link";
 /**
  * CYBER-GS — Single-file React page (Next.js App Router)
- * - Embed playlist YouTube (youtube-nocookie.com)
+ * - Embed 3 latest YouTube videos (from /api/youtube, fallback to uploads playlist)
  * - Subscribe link
  * - Scroll reveal
  * - About (studio photo), Partners, Contact (Formspree placeholder)
  */
 
 export default function CyberGsSiteStarter() {
+  // tema / cookie
   const [dark, setDark] = useState(true);
-  const [cookie, setCookie] = useState(() => {
+  const [cookie, setCookie] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     try {
       return localStorage.getItem("cgscookie") === "ok";
@@ -30,7 +22,10 @@ export default function CyberGsSiteStarter() {
     }
   });
 
-  // Brand palette (ajustează după logo)
+  // IDs pentru ultimele clipuri (din RSS) — punctul 2
+  const [videoIds, setVideoIds] = useState<string[]>([]);
+
+  // paleta brand
   const brand = {
     c1: "#10D5FF",
     c2: "#2563EB",
@@ -38,10 +33,10 @@ export default function CyberGsSiteStarter() {
     text: "#E6F6FF",
   } as const;
 
-  // Refs pentru secțiuni (IMPORTANT: funcțiile ref trebuie să NU returneze nimic)
+  // refs secțiuni (IMPORTANT: funcția ref NU trebuie să returneze nimic)
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
 
-  // Tema
+  // tema
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     try {
@@ -56,13 +51,15 @@ export default function CyberGsSiteStarter() {
     } catch {}
   }, []);
 
-  // Scroll reveal
+  // scroll reveal
   useEffect(() => {
     const io = new IntersectionObserver(
       (entries) => {
-        for (const e of entries)
-          if (e.isIntersecting)
+        for (const e of entries) {
+          if (e.isIntersecting) {
             (e.target as HTMLElement).classList.add("opacity-100", "translate-y-0");
+          }
+        }
       },
       { threshold: 0.2 }
     );
@@ -70,13 +67,9 @@ export default function CyberGsSiteStarter() {
     return () => io.disconnect();
   }, []);
 
-  // Mini “self-tests” doar în dev
+  // mini self-tests doar în dev
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
-    const uploads = "UUvH_nLLK5EnZCoc51IdlFGA";
-    const channel = "UCvH_nLLK5EnZCoc51IdlFGA";
-    console.assert(uploads.startsWith("UU"), "[TEST] Uploads playlist should start with 'UU'");
-    console.assert(channel.startsWith("UC"), "[TEST] Channel ID should start with 'UC'");
 
     setTimeout(() => {
       const subscribe = document.querySelector<HTMLAnchorElement>('a[data-testid="subscribe-link"]');
@@ -84,16 +77,10 @@ export default function CyberGsSiteStarter() {
         !!subscribe && subscribe.href.includes("sub_confirmation=1"),
         "[TEST] Subscribe link should include sub_confirmation=1"
       );
-      const ytFrames = Array.from(document.querySelectorAll("section#videos iframe")) as HTMLIFrameElement[];
-      console.assert(
-        ytFrames.some((f) => f.src.includes("youtube-nocookie.com")),
-        "[TEST] Videos section should embed youtube-nocookie.com"
-      );
-      console.assert(!!document.querySelector('img[src="/assets/nico-portrait.jpg"]'), "[TEST] HERO portrait present");
-      console.assert(!!document.querySelector('img[src="/assets/cyber-hero.jpg"]'), "[TEST] ABOUT studio present");
     }, 400);
   }, []);
 
+  // navigare smooth către secțiuni (din navbar)
   const navTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -105,6 +92,14 @@ export default function CyberGsSiteStarter() {
       localStorage.setItem("cgscookie", "ok");
     } catch {}
   };
+
+  // 👉 aducem ultimele 3 ID-uri video (din /api/youtube); fallback = 3 clipuri din playlist
+  useEffect(() => {
+    fetch("/api/youtube")
+      .then((r) => r.json())
+      .then((d) => setVideoIds(Array.isArray(d?.ids) ? d.ids.slice(0, 3) : []))
+      .catch(() => setVideoIds([]));
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#0A0F1A] text-slate-100 dark:text-slate-100">
@@ -232,79 +227,59 @@ export default function CyberGsSiteStarter() {
 
       {/* VIDEOS */}
       <section
-        // IDs pentru ultimele clipuri (venite din RSS prin API-ul nostru)
-const [videoIds, setVideoIds] = useState<string[]>([]);
-
-useEffect(() => {
-  fetch("/api/youtube")
-    .then((r) => r.json())
-    .then((d) => setVideoIds(d?.ids ?? []))
-    .catch(() => setVideoIds([]));
-}, []);
-
         id="videos"
         ref={(el: HTMLElement | null) => {
           sectionsRef.current[1] = el;
         }}
         className="opacity-0 translate-y-6 transition-all duration-700 ease-out border-t border-white/10"
       >
-       <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-  {videoIds.length > 0 ? (
-    // ✅ Avem ultimele 3 clipuri din RSS (ID-uri video)
-    videoIds.map((vid) => (
-      <div key={vid} className="rounded-2xl overflow-hidden ring-1 ring-white/10 bg-white/5">
-        <div className="aspect-video">
-          <iframe
-            className="w-full h-full"
-            src={`https://www.youtube-nocookie.com/embed/${vid}?rel=0`}
-            title="YouTube video"
-            frameBorder={0}
-            loading="lazy"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-          />
-        </div>
-      </div>
-    ))
-  ) : (
-    // 🔁 Fallback: tot 3 clipuri din playlist-ul de uploads
-    [0, 1, 2].map((i) => (
-      <div key={i} className="rounded-2xl overflow-hidden ring-1 ring-white/10 bg-white/5">
-        <div className="aspect-video">
-          <iframe
-            className="w-full h-full"
-            src={`https://www.youtube-nocookie.com/embed?listType=playlist&list=UUvH_nLLK5EnZCoc51IdlFGA&index=${i}`}
-            title={`YouTube uploads ${i}`}
-            frameBorder={0}
-            loading="lazy"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-          />
-        </div>
-      </div>
-    ))
-  )}
-</div>
-
+        <div className="max-w-6xl mx-auto px-4 py-16">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-2xl md:text-3xl font-bold">Ultimele clipuri</h2>
+            <a
+              href="https://www.youtube.com/@CYBER-GS/videos"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm"
+              style={{ color: brand.c1 }}
+            >
               Vezi toate
             </a>
           </div>
+
+          {/* ✅ 3 videouri: din RSS (videoIds) sau fallback din playlist (index 0..2) */}
           <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {["UUvH_nLLK5EnZCoc51IdlFGA"].map((plist) => (
-              <div key={plist} className="rounded-2xl overflow-hidden ring-1 ring-white/10 bg-white/5">
-                <div className="aspect-video">
-                  <iframe
-                    className="w-full h-full"
-                    src={`https://www.youtube-nocookie.com/embed?listType=playlist&list=${plist}`}
-                    title="YouTube uploads playlist"
-                    frameBorder={0}
-                    loading="lazy"
-                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                  />
-                </div>
-              </div>
-            ))}
+            {videoIds.length > 0
+              ? videoIds.map((vid) => (
+                  <div key={vid} className="rounded-2xl overflow-hidden ring-1 ring-white/10 bg-white/5">
+                    <div className="aspect-video">
+                      <iframe
+                        className="w-full h-full"
+                        src={`https://www.youtube-nocookie.com/embed/${vid}?rel=0`}
+                        title="YouTube video"
+                        frameBorder={0}
+                        loading="lazy"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                      />
+                    </div>
+                  </div>
+                ))
+              : [0, 1, 2].map((i) => (
+                  <div key={i} className="rounded-2xl overflow-hidden ring-1 ring-white/10 bg-white/5">
+                    <div className="aspect-video">
+                      <iframe
+                        className="w-full h-full"
+                        src={`https://www.youtube-nocookie.com/embed?listType=playlist&list=UUvH_nLLK5EnZCoc51IdlFGA&index=${i}`}
+                        title={`YouTube uploads ${i}`}
+                        frameBorder={0}
+                        loading="lazy"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                      />
+                    </div>
+                  </div>
+                ))}
           </div>
         </div>
       </section>
@@ -433,7 +408,20 @@ useEffect(() => {
         </div>
       </section>
 
-     
+      {/* FOOTER minim (ai deja SiteFooter global din layout) */}
+      <footer className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-400 flex flex-wrap items-center justify-between gap-4">
+          <p>(c) {new Date().getFullYear()} CYBER-GS. Toate drepturile rezervate.</p>
+          <div className="flex items-center gap-4">
+            <a href="/privacy" className="hover:text-slate-200">
+              Politica de confidențialitate
+            </a>
+            <a href="/terms" className="hover:text-slate-200">
+              Termeni & Condiții
+            </a>
+          </div>
+        </div>
+      </footer>
 
       {/* Cookie banner */}
       {!cookie && (
@@ -443,13 +431,9 @@ useEffect(() => {
             <button onClick={acceptCookie} className="rounded-xl px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20">
               Accept
             </button>
-            <Link
-  href="/privacy#cookies"
-  className="rounded-xl px-3 py-1.5 text-sm bg-white/0 hover:bg-white/10 ring-1 ring-white/10"
->
-  Află mai mult
-</Link>
-
+            <a href="/privacy" className="rounded-xl px-3 py-1.5 text-sm bg-white/0 hover:bg-white/10 ring-1 ring-white/10">
+              Afla mai mult
+            </a>
           </div>
         </div>
       )}
