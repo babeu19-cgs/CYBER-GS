@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import React from "react";
-import CookieBanner from "@/components/CookieBanner";
+import CookieBanner from "../components/CookieBanner";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cybergs.ro"),
