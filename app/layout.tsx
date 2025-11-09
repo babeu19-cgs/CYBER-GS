@@ -1,5 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
+import type { ReactNode } from "react"; // <-- adăugat
 
 export const metadata = {
   title: "CYBER-GS",
@@ -9,7 +10,7 @@ export const metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode; // <-- folosește ReactNode importat mai sus
 }) {
   return (
     <html lang="ro">
