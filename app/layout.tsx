@@ -51,6 +51,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen">
         {children}
         <CookieBanner />
+     // app/layout.tsx
+import "./globals.css";
+import type { ReactNode } from "react";
+import SiteFooter from "@/components/SiteFooter";
+
+export const metadata = {
+  title: "CYBER-GS",
+  description: "Tech | PC Builds | Film",
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="ro">
+      <body className="min-h-screen">
+        {children}
+        <SiteFooter />
+      </body>
+    </html>
+  );
+}
+
       </body>
     </html>
   );
