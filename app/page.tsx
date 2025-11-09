@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-
+import Link from "next/link";
 /**
  * CYBER-GS — Single-file React page (Next.js App Router)
  * - Embed playlist YouTube (youtube-nocookie.com)
