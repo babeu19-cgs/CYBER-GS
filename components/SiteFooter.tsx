@@ -3,17 +3,21 @@ import Link from "next/link";
 
 export default function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-white/10">
-      <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-3 px-4 py-8 text-sm text-white/70 md:flex-row md:items-center">
-        <p>© {new Date().getFullYear()} CYBER-GS</p>
-        <nav className="flex gap-6">
-          <Link href="/privacy" className="hover:text-white">
+    <footer className="border-t border-white/10 mt-16">
+      <div className="mx-auto max-w-6xl px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p className="text-sm text-white/60">
+          © {new Date().getFullYear()} CYBER-GS. Toate drepturile rezervate.
+        </p>
+
+        <nav className="flex items-center gap-6 text-sm">
+          <Link href="/privacy" className="text-white/70 hover:text-white">
             Politica de confidențialitate
           </Link>
-          <Link href="/terms" className="hover:text-white">
-            Termeni &amp; Condiții
+          <Link href="/terms" className="text-white/70 hover:text-white">
+            Termeni & Condiții
           </Link>
-          <Link href="/sitemap.xml" className="hover:text-white">
+          {/* Next.js servește automat /sitemap.xml din app/sitemap.ts */}
+          <Link href="/sitemap.xml" className="text-white/70 hover:text-white">
             Sitemap
           </Link>
         </nav>
