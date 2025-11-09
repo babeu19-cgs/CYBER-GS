@@ -54,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
      // app/layout.tsx
 import "./globals.css";
 import type { ReactNode } from "react";
-import SiteFooter from "@/components/SiteFooter";
+import SiteFooter from "/components/SiteFooter";
 
 export const metadata = {
   title: "CYBER-GS",
