@@ -1,5 +1,15 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+// IDs pentru ultimele clipuri (venite din API-ul nostru /api/youtube)
+const [videoIds, setVideoIds] = useState<string[]>([]);
+
+useEffect(() => {
+  fetch("/api/youtube")
+    .then((r) => r.json())
+    .then((d) => setVideoIds(d?.ids ?? []))
+    .catch(() => setVideoIds([]));
+}, []);
+
 import Link from "next/link";
 /**
  * CYBER-GS — Single-file React page (Next.js App Router)
@@ -238,16 +248,44 @@ useEffect(() => {
         }}
         className="opacity-0 translate-y-6 transition-all duration-700 ease-out border-t border-white/10"
       >
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="flex items-end justify-between gap-4">
-            <h2 className="text-2xl md:text-3xl font-bold">Ultimele clipuri</h2>
-            <a
-              href="https://www.youtube.com/@CYBER-GS/videos"
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm"
-              style={{ color: brand.c1 }}
-            >
+       <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {videoIds.length > 0 ? (
+    // ✅ Avem ultimele 3 clipuri din RSS (ID-uri video)
+    videoIds.map((vid) => (
+      <div key={vid} className="rounded-2xl overflow-hidden ring-1 ring-white/10 bg-white/5">
+        <div className="aspect-video">
+          <iframe
+            className="w-full h-full"
+            src={`https://www.youtube-nocookie.com/embed/${vid}?rel=0`}
+            title="YouTube video"
+            frameBorder={0}
+            loading="lazy"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        </div>
+      </div>
+    ))
+  ) : (
+    // 🔁 Fallback: tot 3 clipuri din playlist-ul de uploads
+    [0, 1, 2].map((i) => (
+      <div key={i} className="rounded-2xl overflow-hidden ring-1 ring-white/10 bg-white/5">
+        <div className="aspect-video">
+          <iframe
+            className="w-full h-full"
+            src={`https://www.youtube-nocookie.com/embed?listType=playlist&list=UUvH_nLLK5EnZCoc51IdlFGA&index=${i}`}
+            title={`YouTube uploads ${i}`}
+            frameBorder={0}
+            loading="lazy"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        </div>
+      </div>
+    ))
+  )}
+</div>
+
               Vezi toate
             </a>
           </div>
