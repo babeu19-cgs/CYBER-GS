@@ -386,19 +386,24 @@ export default function CyberGsSiteStarter() {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-400 flex flex-wrap items-center justify-between gap-4">
-          <p>(c) {new Date().getFullYear()} CYBER-GS. Toate drepturile rezervate.</p>
-          <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-slate-200">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-slate-200">
-              Terms
-            </a>
-          </div>
-        </div>
-      </footer>
+<footer className="border-t border-white/10">
+  <div className="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-400 flex flex-wrap items-center justify-between gap-4">
+    <p>© {new Date().getFullYear()} CYBER-GS. Toate drepturile rezervate.</p>
+
+    <nav className="flex items-center gap-4">
+      <Link href="/privacy" className="hover:text-slate-200">
+        Politica de confidențialitate
+      </Link>
+      <Link href="/terms" className="hover:text-slate-200">
+        Termeni & Condiții
+      </Link>
+      <Link href="/sitemap.xml" className="hover:text-slate-200">
+        Sitemap
+      </Link>
+    </nav>
+  </div>
+</footer>
+
 
       {/* Cookie banner */}
       {!cookie && (
