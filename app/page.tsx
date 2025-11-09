@@ -222,6 +222,16 @@ export default function CyberGsSiteStarter() {
 
       {/* VIDEOS */}
       <section
+        // IDs pentru ultimele clipuri (venite din RSS prin API-ul nostru)
+const [videoIds, setVideoIds] = useState<string[]>([]);
+
+useEffect(() => {
+  fetch("/api/youtube")
+    .then((r) => r.json())
+    .then((d) => setVideoIds(d?.ids ?? []))
+    .catch(() => setVideoIds([]));
+}, []);
+
         id="videos"
         ref={(el: HTMLElement | null) => {
           sectionsRef.current[1] = el;
